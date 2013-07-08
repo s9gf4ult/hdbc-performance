@@ -5,7 +5,6 @@ module Main where
 import Criterion.Main (Benchmark, bench, defaultMain, nfIO, bgroup)
 
 import Database.HDBC
-import Database.HDBC.ODBC
 import Database.HDBC.PostgreSQL
 
 import Data.Time.Calendar (Day, fromGregorian)
@@ -18,7 +17,6 @@ main :: IO ()
 main = do
   -- Connect
   connPostgreSQL <- connectPostgreSQL "host=localhost dbname=hdbc-test user=hdbc password=qwerfdsa"
-  connODBC       <- connectODBC "DSN=HDBC"
 
   -- Setup
   setupInsert connPostgreSQL
@@ -26,8 +24,7 @@ main = do
 
   -- Benchmark
   defaultMain
-    [ benchBackend "odbc"       connODBC
-    , benchBackend "postgresql" connPostgreSQL
+    [ benchBackend "postgresql" connPostgreSQL
     ]
 
   -- Teardown
@@ -36,7 +33,6 @@ main = do
 
   -- Disconnect
   disconnect connPostgreSQL
-  disconnect connODBC
 
 benchBackend :: IConnection conn => String -> conn -> Benchmark
 benchBackend backend conn = bgroup backend
